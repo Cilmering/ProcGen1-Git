@@ -24,8 +24,8 @@ public class TextureAtlas
 {
     public static List<TextureUV> textureUVs;
     public static TextureAtlas instance = new TextureAtlas();
-    public static readonly int pixelWidth = 64;
-    public static readonly int pixelHeight = 64;
+    public static readonly int pixelWidth = 128;
+    public static readonly int pixelHeight = 128;
     public static int atlasHeight = 0;
     public static int atlasWidth = 0;
     public static Texture2D atlas;

@@ -76,7 +76,7 @@ public class TerrainGeneration : MonoBehaviour
         mTerrainNoise.InitializeNoise(Width + 1, Depth + 1, RandomSeed);
         mTerrainNoise.InitializePerlinNoise(Frequency, Amplitude, Octaves, 
             Lacunarity, Gain, Scale, NormalizeBias);
-        NativeArray<float> terrainHeightMap = new NativeArray<float>((Width+1) * (Depth+1), Allocator.Persistent);
+        NativeArray<float> terrainHeightMap = new NativeArray<float>(((Width)+1) * ((Depth) +1), Allocator.Persistent);
         mTerrainNoise.setNoise(terrainHeightMap, 0, 0);
         
         // create the mesh and set it to the terrain variable
@@ -144,32 +144,32 @@ public class TerrainGeneration : MonoBehaviour
 
                     if (y >= snowStart)
                     {
-                        uvs.Add(new Vector2(0.5f, 0.5f));
-                        uvs.Add(new Vector2(0.5f, 1.0f));
-                        uvs.Add(new Vector2(1.0f, 0.5f));
-                        uvs.Add(new Vector2(1.0f, 1.0f));
+                        uvs.Add(new Vector2(0f, 0.75f));
+                        uvs.Add(new Vector2(0f, 1f));
+                        uvs.Add(new Vector2(0.25f, 0.75f));
+                        uvs.Add(new Vector2(0.25f, 1f));
                     } else if (y >= rockStart)
                     {
-                        uvs.Add(new Vector2(0.5f, 0f));
                         uvs.Add(new Vector2(0.5f, 0.5f));
-                        uvs.Add(new Vector2(1.0f, 0f));
-                        uvs.Add(new Vector2(1.0f, 0.5f));
+                        uvs.Add(new Vector2(0.5f, 0.75f));
+                        uvs.Add(new Vector2(0.75f, 0.5f));
+                        uvs.Add(new Vector2(0.75f, 0.75f));
                     }
                     else if (y >= grassStart)
                     {
                         // remember to give it all 4 sides of the image coords
-                        uvs.Add(new Vector2(0.0f, 0.0f));
-                        uvs.Add(new Vector2(0.0f, 0.5f));
-                        uvs.Add(new Vector2(0.5f, 0.0f));
-                        uvs.Add(new Vector2(0.5f, 0.5f));
+                        uvs.Add(new Vector2(0.75f, 0.0f));
+                        uvs.Add(new Vector2(0.75f, 0.25f));
+                        uvs.Add(new Vector2(1f, 0.0f));
+                        uvs.Add(new Vector2(1f, 0.25f));
                     }
                     else
                     {
                         // remember to give it all 4 sides of the image coords
-                        uvs.Add(new Vector2(0.0f, 0.5f));
-                        uvs.Add(new Vector2(0.0f, 1.0f));
-                        uvs.Add(new Vector2(0.5f, 0.5f));
-                        uvs.Add(new Vector2(0.5f, 1.0f));
+                        uvs.Add(new Vector2(0.75f, 0.5f));
+                        uvs.Add(new Vector2(0.75f, 0.75f));
+                        uvs.Add(new Vector2(1f, 0.5f));
+                        uvs.Add(new Vector2(1f, 0.75f));
                     }
 
 
