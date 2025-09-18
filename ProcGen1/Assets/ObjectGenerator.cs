@@ -18,10 +18,10 @@ public class ObjectGenerator : MonoBehaviour
     public float treeThreshold = -7f;
 
     // x 0 to 128; z 0 to 128
-    private float areaXMin = 0;
-    private float areaXMax = 128;
-    private float areaZMin = 0;
-    private float areaZMax = 128;
+    //private float areaXMin = 0;
+    //private float areaXMax = 128;
+    //private float areaZMin = 0;
+    //private float areaZMax = 128;
 
     public int numberOfObjects = 100;
 
@@ -32,7 +32,7 @@ public class ObjectGenerator : MonoBehaviour
         //GenerateObjects();
     }
 
-    public void GenerateObjects()
+    public void GenerateObjects(float areaXMin, float areaXMax, float areaZMin, float areaZMax)
     {
         Random.InitState(randomSeed);
 

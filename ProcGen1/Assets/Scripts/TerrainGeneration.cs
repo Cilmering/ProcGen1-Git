@@ -26,6 +26,7 @@ public class TerrainGeneration : MonoBehaviour
     public float sandStart = -10f;
     
     public ObjectGenerator objectGenerator;
+    public int generationRadius = 2; // desired radius (1 = 1 chunk, 2 = 3x3, 3 = 5x5, etc.)
 
     private GameObject mRealTerrain;
     private NoiseAlgorithm mTerrainNoise;
@@ -67,37 +68,50 @@ public class TerrainGeneration : MonoBehaviour
             RenderSettings.fog = true;
         }
     }
-    
+
     // Start is called before the first frame update
     void Start()
     {
-        // create a height map using perlin noise and fractal brownian motion
-        mTerrainNoise = new NoiseAlgorithm();
-        mTerrainNoise.InitializeNoise(Width + 1, Depth + 1, RandomSeed);
-        mTerrainNoise.InitializePerlinNoise(Frequency, Amplitude, Octaves, 
-            Lacunarity, Gain, Scale, NormalizeBias);
-        NativeArray<float> terrainHeightMap = new NativeArray<float>(((Width)+1) * ((Depth) +1), Allocator.Persistent);
-        mTerrainNoise.setNoise(terrainHeightMap, 0, 0);
-        
-        // create the mesh and set it to the terrain variable
-        mRealTerrain = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        mRealTerrain.transform.position = new Vector3(0, 0, 0);
-        MeshRenderer meshRenderer = mRealTerrain.GetComponent<MeshRenderer>();
-        MeshFilter meshFilter = mRealTerrain.GetComponent<MeshFilter>();
-        meshRenderer.material = TerrainMaterial;
-        meshFilter.mesh = GenerateTerrainMesh(terrainHeightMap);
-        terrainHeightMap.Dispose();
-        NoiseAlgorithm.OnExit();
+        int half = generationRadius - 1;
 
-        // Sebastian's added code to make the terrain collider work
-        MeshCollider meshCollider = mRealTerrain.GetComponent<MeshCollider>();
-        if (meshCollider == null)
+        for (int dx = -half; dx <= half; dx++)
         {
-            meshCollider = mRealTerrain.AddComponent<MeshCollider>();
+            for (int dz = -half; dz <= half; dz++)
+            {
+                // Start by creating a NoiseAlgorithm for each chunk
+                NoiseAlgorithm chunkNoise = new NoiseAlgorithm();
+                chunkNoise.InitializeNoise(Width + 1, Depth + 1, RandomSeed);
+
+                // Offset the noise sampling
+                float chunkOffsetX = dx * Width;
+                float chunkOffsetZ = dz * Depth;
+                chunkNoise.InitializePerlinNoise(Frequency, Amplitude, Octaves, 
+                    Lacunarity, Gain, Scale, NormalizeBias);
+                NativeArray<float> terrainHeightMap = new NativeArray<float>((Width + 1) * (Depth + 1), Allocator.Persistent);
+                chunkNoise.setNoise(terrainHeightMap, (int)chunkOffsetX, (int)chunkOffsetZ);
+
+                // Create the mesh and set it to a new terrain GameObject
+                GameObject chunkTerrain = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                chunkTerrain.transform.position = new Vector3(chunkOffsetX, 0, chunkOffsetZ);
+                MeshRenderer meshRenderer = chunkTerrain.GetComponent<MeshRenderer>();
+                MeshFilter meshFilter = chunkTerrain.GetComponent<MeshFilter>();
+                meshRenderer.material = TerrainMaterial;
+                meshFilter.mesh = GenerateTerrainMesh(terrainHeightMap);
+                terrainHeightMap.Dispose();
+
+                // Add collider
+                MeshCollider meshCollider = chunkTerrain.GetComponent<MeshCollider>();
+                if (meshCollider == null)
+                {
+                    meshCollider = chunkTerrain.AddComponent<MeshCollider>();
+                }
+                meshCollider.sharedMesh = meshFilter.mesh;
+
+                // Generate objects for this chunk
+                objectGenerator.GenerateObjects(chunkOffsetX, chunkOffsetX + Width, chunkOffsetZ, chunkOffsetZ + Depth);
+            }
         }
-        meshCollider.sharedMesh = meshFilter.mesh;
-        objectGenerator.GenerateObjects();
-        // end of Sebastian's added code
+        NoiseAlgorithm.OnExit();
     }
 
     private void Update()
